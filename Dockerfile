@@ -9,4 +9,4 @@ FROM eclipse-temurin:21-jdk-jammy
 ARG JAR_FILE=/usr/backend/target/*.jar
 COPY --from=build $JAR_FILE /app/runner.jar
 EXPOSE 8080
-ENTRYPOINT java -jar /app/runner.jar
+CMD ["java", "-jar", "/app/runner.jar"]
