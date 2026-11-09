@@ -1,0 +1,25 @@
+services:
+  proxy:
+    image: traefik:v3.6
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - 80:80
+      - 8080:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  backend:
+    build:
+      context: ./
+      target: run-backend
+    develop:
+      watch:
+        - path: ./backend/src
+          action: rebuild
+    labels:
+      traefik.http.routers.backend.rule: Host(`localhost`) && PathPrefix(`/api`)
+      traefik.http.services.backend.loadbalancer.server.port: 8080
+      traefik.http.middlewares.strip-api.stripprefix.prefixes: /api
+      traefik.http.routers.backend.middlewares: strip-api
